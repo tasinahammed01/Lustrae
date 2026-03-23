@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
+import { useCountUp } from "@/_hooks/useCountUp";
 
 type Service = {
   title: string;
@@ -103,6 +106,28 @@ function SecondaryButton({
   );
 }
 
+function AnimatedNumber({
+  end,
+  suffix = "",
+  prefix = "",
+  duration = 2000,
+}: {
+  end: number;
+  suffix?: string;
+  prefix?: string;
+  duration?: number;
+}) {
+  const { count, ref } = useCountUp({ end, duration });
+
+  return (
+    <span ref={ref} className="text-2xl font-semibold text-primary">
+      {prefix}
+      {count}
+      {suffix}
+    </span>
+  );
+}
+
 function SectionHeading({
   eyebrow,
   title,
@@ -157,7 +182,7 @@ export default function Page() {
             </p>
 
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <PrimaryButton href="/booking">Book Appointment</PrimaryButton>
+              <PrimaryButton href="/book">Book Appointment</PrimaryButton>
               <SecondaryButton href="#services">View Services</SecondaryButton>
             </div>
           </div>
@@ -168,11 +193,11 @@ export default function Page() {
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="grid grid-cols-1 gap-6 text-center sm:grid-cols-3 sm:text-left">
             <div className="rounded-2xl bg-white/40 px-6 py-6 shadow-sm">
-              <p className="text-2xl font-semibold text-primary">500+</p>
+              <AnimatedNumber end={500} suffix="+" />
               <p className="mt-2 text-sm text-secondary">Happy clients</p>
             </div>
             <div className="rounded-2xl bg-white/40 px-6 py-6 shadow-sm">
-              <p className="text-2xl font-semibold text-primary">5★</p>
+              <AnimatedNumber end={5} suffix="★" duration={1500} />
               <p className="mt-2 text-sm text-secondary">Rated salon</p>
             </div>
             <div className="rounded-2xl bg-white/40 px-6 py-6 shadow-sm">
@@ -220,7 +245,7 @@ export default function Page() {
           </div>
 
           <div className="mt-10 flex justify-center">
-            <SecondaryButton href="/gallery">View All Services</SecondaryButton>
+            <SecondaryButton href="/services">View All Services</SecondaryButton>
           </div>
         </div>
       </section>
@@ -300,7 +325,7 @@ export default function Page() {
                 balance longevity with softness for a truly elevated finish.
               </p>
               <div className="mt-8">
-                <PrimaryButton href="/booking?type=event">
+                <PrimaryButton href="/book">
                   Book for Your Event
                 </PrimaryButton>
               </div>
@@ -417,7 +442,7 @@ export default function Page() {
                   everyday refinement.
                 </p>
                 <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-                  <PrimaryButton href="/booking">Book Your Appointment</PrimaryButton>
+                  <PrimaryButton href="/book">Book Your Appointment</PrimaryButton>
                   <SecondaryButton href="#services">Explore Services</SecondaryButton>
                 </div>
               </div>

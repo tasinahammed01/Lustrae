@@ -49,7 +49,7 @@ export function Navbar() {
           </div>
 
           <Link
-            href="/booking"
+            href="/book"
             className="inline-flex h-10 items-center justify-center rounded-full bg-button px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-button-hover"
           >
             Book Now
@@ -99,7 +99,7 @@ export function Navbar() {
             ))}
 
             <Link
-              href="/booking"
+              href="/book"
               className="mt-2 inline-flex h-11 items-center justify-center rounded-full bg-button px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-button-hover"
               onClick={() => setIsOpen(false)}
             >
