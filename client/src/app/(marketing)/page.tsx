@@ -3,6 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
+import BeforeAfterCard from "@/components/gallery/BeforeAfterCard";
+import { InstagramFeed } from "@/components/social/InstagramFeed";
 import { useCountUp } from "@/_hooks/useCountUp";
 
 type Service = {
@@ -44,6 +46,37 @@ const services: Service[] = [
     imageUrl: "/Lash & Brow.png",
   },
 ];
+
+const galleryPreview = [
+  {
+    category: "Hair",
+    before:
+      "/Hair Styling.png",
+    after:
+      "/Keratin Restore.png",
+  },
+  {
+    category: "Bridal",
+    before:
+      "/Bridal Makeup.png",
+    after:
+      "/Bridal Makeup Kit.png",
+  },
+  {
+    category: "Skin",
+    before:
+      "/Skincare Treatment.png",
+    after:
+      "/Glow Serum.png",
+  },
+  {
+    category: "Hair",
+    before:
+      "/Lash & Brow.png",
+    after:
+      "/Matte Lip Collection.png",
+  },
+] as const;
 
 const testimonials: Testimonial[] = [
   {
@@ -250,6 +283,31 @@ export default function Page() {
         </div>
       </section>
 
+      <section className="bg-background">
+        <div className="mx-auto max-w-7xl px-6 py-20">
+          <SectionHeading
+            eyebrow="Real Transformations"
+            title="See the artistry behind every look"
+            description="Before and after moments that capture our signature: soft glamour, refined detail, and effortless confidence."
+          />
+
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {galleryPreview.map((item, idx) => (
+              <BeforeAfterCard
+                key={`${item.category}-${idx}`}
+                before={item.before}
+                after={item.after}
+                category={item.category}
+              />
+            ))}
+          </div>
+
+          <div className="mt-10 flex justify-center">
+            <PrimaryButton href="/gallery">View Full Gallery</PrimaryButton>
+          </div>
+        </div>
+      </section>
+
       <section id="products" className="bg-background">
         <div className="mx-auto max-w-7xl px-6 py-20">
           <div className="mx-auto max-w-2xl text-center">
@@ -424,6 +482,8 @@ export default function Page() {
           </div>
         </div>
       </section>
+
+      <InstagramFeed username="@yourbrand" followUrl="https://instagram.com" />
 
       <section className="bg-background">
         <div className="mx-auto max-w-7xl px-6 py-20">

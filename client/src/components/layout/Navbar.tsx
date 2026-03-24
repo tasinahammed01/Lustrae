@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { ShoppingBag } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useCartStore, type CartItem } from "@/store/cartStore";
+
+interface CartStateShape {
+  items: CartItem[];
+}
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -12,6 +18,9 @@ const navLinks = [
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const totalItems = useCartStore((state: CartStateShape) =>
+    state.items.reduce((sum, item) => sum + item.quantity, 0)
+  );
 
   useEffect(() => {
     const onResize = () => {
@@ -47,6 +56,19 @@ export function Navbar() {
               </Link>
             ))}
           </div>
+
+          <Link
+            href="/cart"
+            className="relative rounded-full p-2 text-secondary transition-colors hover:text-primary"
+            aria-label="Shopping cart"
+          >
+            <ShoppingBag className="h-5 w-5" />
+            {totalItems > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-xs font-semibold text-white">
+                {totalItems > 9 ? "9+" : totalItems}
+              </span>
+            )}
+          </Link>
 
           <Link
             href="/book"

@@ -1,15 +1,44 @@
 "use client";
 
 import { SlidersHorizontal } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { toast } from "react-toastify";
 import { FilterSidebar } from "@/components/shop/FilterSidebar";
 import { SearchBar, SortBar } from "@/components/shop/SearchAndSort";
 import { ShopProductCard } from "@/components/shop/ShopProductCard";
-import { products } from "@/components/shop/data";
+import { useCartStore, type CartItem } from "@/store/cartStore";
+
+interface ApiProduct {
+  _id: string;
+  name: string;
+  price: number;
+  image: string;
+  category: string;
+  rating: number;
+  createdAt: string;
+}
 
 const PRODUCTS_PER_PAGE = 8;
 
 export default function ShopPage() {
+  const [apiProducts, setApiProducts] = useState<ApiProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const addToCart = useCartStore((state: { addToCart: (p: Omit<CartItem, "quantity">) => void }) => state.addToCart);
+  const items = useCartStore((state: { items: CartItem[] }) => state.items);
+  const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  useEffect(() => {
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.data)) {
+          setApiProducts(data.data);
+        }
+      })
+      .catch(() => toast.error("Failed to load products"))
+      .finally(() => setIsLoading(false));
+  }, []);
+
   // Filter states
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
@@ -18,11 +47,10 @@ export default function ShopPage() {
   const [sortBy, setSortBy] = useState("featured");
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [cartCount, setCartCount] = useState(0);
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
-    let result = [...products];
+    let result = [...apiProducts];
 
     // Search filter
     if (searchQuery.trim()) {
@@ -30,14 +58,14 @@ export default function ShopPage() {
       result = result.filter(
         (p) =>
           p.name.toLowerCase().includes(query) ||
-          p.description.toLowerCase().includes(query)
+          p.category.toLowerCase().includes(query)
       );
     }
 
     // Category filter
     if (selectedCategories.length > 0) {
       result = result.filter((p) =>
-        selectedCategories.includes(p.category)
+        selectedCategories.includes(p.category.toLowerCase())
       );
     }
 
@@ -63,19 +91,15 @@ export default function ShopPage() {
         result.sort((a, b) => b.rating - a.rating);
         break;
       case "newest":
-        result.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+        result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         break;
       default:
-        // Featured: bestsellers first, then by rating
-        result.sort((a, b) => {
-          if (a.isBestseller && !b.isBestseller) return -1;
-          if (!a.isBestseller && b.isBestseller) return 1;
-          return b.rating - a.rating;
-        });
+        // Featured: by rating
+        result.sort((a, b) => b.rating - a.rating);
     }
 
     return result;
-  }, [selectedCategories, priceRange, minRating, searchQuery, sortBy]);
+  }, [apiProducts, selectedCategories, priceRange, minRating, searchQuery, sortBy]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
@@ -92,8 +116,15 @@ export default function ShopPage() {
     setCurrentPage(1);
   };
 
-  const handleAddToCart = () => {
-    setCartCount((prev) => prev + 1);
+  const handleAddToCart = (product: ApiProduct) => {
+    addToCart({
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category,
+    });
+    toast.success(`${product.name} added to cart`);
   };
 
   const hasActiveFilters =

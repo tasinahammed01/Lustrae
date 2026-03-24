@@ -5,10 +5,11 @@ import Image from "next/image";
 import { useState } from "react";
 
 interface ShopProductCardProps {
-  id: number;
+  _id: string;
   image: string;
   name: string;
-  description: string;
+  description?: string;
+  category?: string;
   price: number;
   rating: number;
   reviews?: number;
@@ -16,10 +17,11 @@ interface ShopProductCardProps {
 }
 
 export function ShopProductCard({
-  id,
+  _id,
   image,
   name,
   description,
+  category,
   price,
   rating,
   reviews = 0,
@@ -75,7 +77,7 @@ export function ShopProductCard({
       <div className="p-5">
         {/* Category Tag */}
         <span className="text-xs font-medium uppercase tracking-wide text-accent">
-          {description.split(" ")[0]}
+          {category || description?.split(" ")[0] || "Product"}
         </span>
 
         {/* Product Name */}
